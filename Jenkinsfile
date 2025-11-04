@@ -7,31 +7,40 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    if (!fileExists("${env.WORKSPACE}/${VIRTUAL_ENV}")) {
-                        sh "python -m venv ${VIRTUAL_ENV}"
+                    if (!fileExists("${env.WORKSPACE}\\${VIRTUAL_ENV}")) {
+                        powershell "python -m venv ${VIRTUAL_ENV}"
                     }
-                    sh "source ${VIRTUAL_ENV}/bin/activate && pip install -r requirements.txt"
+                    powershell """
+                        & ${VIRTUAL_ENV}\\Scripts\\Activate.ps1
+                        pip install -r requirements.txt
+                    """
                 }
             }
         }
         stage('Lint') {
             steps {
                 script {
-                    sh "source ${VIRTUAL_ENV}/bin/activate && flake8 app.py"
+                    powershell """
+                        & ${VIRTUAL_ENV}\\Scripts\\Activate.ps1
+                        flake8 app.py
+                    """
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    sh "source ${VIRTUAL_ENV}/bin/activate && pytest"
+                    powershell """
+                        & ${VIRTUAL_ENV}\\Scripts\\Activate.ps1
+                        pytest
+                    """
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    echo "Deploying application..."
+                    echo 'Deploying application...'
                 }
             }
         }
