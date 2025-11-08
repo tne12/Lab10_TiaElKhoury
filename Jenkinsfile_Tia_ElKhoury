@@ -33,12 +33,12 @@ pipeline {
     steps {
         powershell """
         & ${env.VENV}\\Scripts\\Activate.ps1
+        Set-Location "$env:WORKSPACE"
+        \$env:PYTHONPATH = "\$env:WORKSPACE"
         pytest -q
         """
     }
     }
-
-
 
     stage('Deploy') {
       steps {
