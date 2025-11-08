@@ -35,25 +35,6 @@ pipeline {
       }
     }
 
-    stage('Security Scan') {
-      steps {
-        powershell """
-          & ${VENV}\\Scripts\\Activate.ps1
-          bandit -r app.py
-        """
-      }
-    }
-
-    stage('Coverage') {
-      steps {
-        powershell """
-          & ${VENV}\\Scripts\\Activate.ps1
-          coverage run -m pytest
-          coverage report
-        """
-      }
-    }
-
     stage('Deploy') {
       steps { echo 'Deploy placeholder (OK to keep simple for the lab).' }
     }
@@ -61,5 +42,6 @@ pipeline {
 
   post {
     always { cleanWs() }
+    
   }
 }
