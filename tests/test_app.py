@@ -3,7 +3,7 @@ import unittest
 from app import greet
 class TestApp(unittest.TestCase):
     def test_greet(self):
-        self.assertEqual(greet("World"), "Hello, World fromFirstName LastName!")
+        self.assertEqual(greet("World"), "Hello, World from Tia El Khoury!")
 
-if __name__ == " main ":
+if __name__ == "__main__":
     unittest.main()
