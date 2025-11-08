@@ -4,18 +4,24 @@ pipeline {
     VENV = 'venv'
   }
 
-  stages {
     stage('Setup') {
-      steps {
-        // Create venv (idempotent) + install deps
+    steps {
         powershell """
-          if (!(Test-Path ${VENV})) { python -m venv ${VENV} }
-          & ${VENV}\\Scripts\\Activate.ps1
-          pip install --upgrade pip
-          pip install -r requirements.txt
+        # Make venv with Windows Python launcher if available, else use full path
+        if (!(Test-Path venv)) {
+            if (Get-Command py -ErrorAction SilentlyContinue) {
+            py -3 -m venv venv
+            } else {
+            & 'C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe' -m venv venv
+            }
+        }
+        & venv\\Scripts\\Activate.ps1
+        pip install --upgrade pip
+        pip install -r requirements.txt
         """
-      }
     }
+    }
+
 
     stage('Lint') {
       steps {
