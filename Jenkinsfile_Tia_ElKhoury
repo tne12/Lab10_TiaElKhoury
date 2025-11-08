@@ -33,12 +33,11 @@ pipeline {
     steps {
         powershell """
         & ${env.VENV}\\Scripts\\Activate.ps1
-        # Make the repo root importable
-        $env:PYTHONPATH = "$env:WORKSPACE"
         pytest -q
         """
     }
     }
+
 
 
     stage('Deploy') {
