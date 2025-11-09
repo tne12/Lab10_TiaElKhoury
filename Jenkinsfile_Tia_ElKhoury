@@ -57,14 +57,7 @@ pipeline {
       steps {
         powershell '''
           $venvPy = Join-Path "$env:VENV" "Scripts/python.exe"
-
-          # Exclude venv, tests, .git. Quiet output. Write to a file.
-          & "$venvPy" -m bandit -r . -x venv,tests,.git -q -f txt -o bandit-report.txt
-
-          # If Bandit sets a non-zero exit, continue anyway (lab wants a report, not a gate).
-          if ($LASTEXITCODE -ne 0) {
-            Write-Warning "Bandit found findings. Continuing and archiving report for review."
-          }
+          & "$venvPy" -m bandit -r . -x venv,tests,.git -q -f txt -o bandit-report.txt --exit-zero
         '''
         archiveArtifacts artifacts: 'bandit-report.txt', fingerprint: true
       }
