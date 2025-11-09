@@ -38,6 +38,32 @@ pipeline {
         '''
       }
     }
+    
+    stage('Coverage') {
+      steps {
+        powershell '''
+          $venvPy = Join-Path "$env:VENV" "Scripts/python.exe"
+          # run tests with coverage
+          & "$venvPy" -m coverage run -m pytest
+          # create HTML and XML reports
+          & "$venvPy" -m coverage html
+          & "$venvPy" -m coverage xml
+        '''
+        archiveArtifacts artifacts: 'htmlcov/**, coverage.xml', fingerprint: true
+      }
+    }
+
+    stage('Security Scan') {
+      steps {
+        powershell '''
+          $venvPy = Join-Path "$env:VENV" "Scripts/python.exe"
+          # fail on high-severity issues
+          & "$venvPy" -m bandit -r . -lll -q -o bandit-report.txt
+        '''
+        archiveArtifacts artifacts: 'bandit-report.txt', fingerprint: true
+      }
+    }
+
 
     stage('Deploy') {
       steps {
