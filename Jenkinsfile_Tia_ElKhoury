@@ -5,39 +5,34 @@ pipeline {
   stages {
     stage('Setup') {
       steps {
-        powershell """
-          if (!(Test-Path ${env.VENV})) {
+        powershell '''
+          if (!(Test-Path ${env:VENV})) {
             if (Get-Command py -ErrorAction SilentlyContinue) {
-              py -3 -m venv ${env.VENV}
+              py -3 -m venv ${env:VENV}
             } else {
-              & 'C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python311\\python.exe' -m venv ${env.VENV}
+              python -m venv ${env:VENV}
             }
           }
-          & ${env.VENV}\\Scripts\\Activate.ps1
-          pip install --upgrade pip
-          pip install -r requirements.txt
-        """
+          ${env:VENV}\\Scripts\\python -m pip install --upgrade pip
+          ${env:VENV}\\Scripts\\pip install -r requirements.txt
+        '''
       }
     }
 
     stage('Lint') {
       steps {
-        powershell """
-          & ${env.VENV}\\Scripts\\Activate.ps1
-          flake8 app.py
-        """
+        powershell '''
+          ${env:VENV}\\Scripts\\flake8 app.py
+        '''
       }
     }
 
     stage('Test') {
-    steps {
-        powershell """
-        & ${env.VENV}\\Scripts\\Activate.ps1
-        Set-Location "$env:WORKSPACE"
-        \$env:PYTHONPATH = "\$env:WORKSPACE"
-        pytest -q
-        """
-    }
+      steps {
+        powershell '''
+          ${env:VENV}\\Scripts\\pytest -q
+        '''
+      }
     }
 
     stage('Deploy') {
@@ -48,6 +43,8 @@ pipeline {
   }
 
   post {
-    always { cleanWs() }
+    always {
+      cleanWs()
+    }
   }
 }
