@@ -6,15 +6,17 @@ pipeline {
     stage('Setup') {
       steps {
         powershell '''
-          if (!(Test-Path ${env:VENV})) {
+          if (!(Test-Path "$env:VENV")) {
             if (Get-Command py -ErrorAction SilentlyContinue) {
-              py -3 -m venv ${env:VENV}
+              py -3 -m venv "$env:VENV"
             } else {
-              python -m venv ${env:VENV}
+              python -m venv "$env:VENV"
             }
           }
-          ${env:VENV}\\Scripts\\python -m pip install --upgrade pip
-          ${env:VENV}\\Scripts\\pip install -r requirements.txt
+
+          $py = Join-Path "$env:VENV" "Scripts/python.exe"
+          & "$py" -m pip install --upgrade pip
+          & "$py" -m pip install -r requirements.txt
         '''
       }
     }
@@ -22,7 +24,8 @@ pipeline {
     stage('Lint') {
       steps {
         powershell '''
-          ${env:VENV}\\Scripts\\flake8 app.py
+          $py = Join-Path "$env:VENV" "Scripts/python.exe"
+          & "$py" -m flake8 app.py
         '''
       }
     }
@@ -30,7 +33,8 @@ pipeline {
     stage('Test') {
       steps {
         powershell '''
-          ${env:VENV}\\Scripts\\pytest -q
+          $py = Join-Path "$env:VENV" "Scripts/python.exe"
+          & "$py" -m pytest -q
         '''
       }
     }
